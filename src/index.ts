@@ -1,16 +1,19 @@
 import * as ts from "typescript/lib/tsserverlibrary";
+import { getCssOptions } from "./config";
 
 const factory: ts.server.PluginModuleFactory = (mod: {
   typescript: typeof ts;
 }) => {
   const pluginModule: ts.server.PluginModule = {
-    create: create,
+    create,
   };
   return pluginModule;
 };
 
 const create = (info: ts.server.PluginCreateInfo): ts.LanguageService => {
   const ls = info.languageService;
+  let css: any;
+  getCssOptions().then((_css) => (css = _css));
 
   // オリジナルのメソッドを退避しておく
   const delegate = ls.getQuickInfoAtPosition;
@@ -28,7 +31,7 @@ const create = (info: ts.server.PluginCreateInfo): ts.LanguageService => {
     result.displayParts = [
       { kind: "", text: " 🎉🎉 " },
       ...result.displayParts,
-      { kind: "", text: " 🎉🎉 " },
+      { kind: "", text: JSON.stringify(css) },
     ];
     return result;
   };
