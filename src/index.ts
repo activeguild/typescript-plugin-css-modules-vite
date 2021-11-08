@@ -1,14 +1,26 @@
+import path from "path";
+import postcss from "postcss";
+import postcssJs from "postcss-js";
 import ts from "typescript/lib/tsserverlibrary";
-import { getCssOptions } from "./config";
+import { ResolvedConfig } from "vite";
+import { parseCss } from "./css";
+import { extractClassNameKeys } from "./extract";
+import { getViteConfig } from "./sample";
+// import { CSS } from "./type";
+import { isCSSFile } from "./util";
+
+// resolve vite.config.ts
 
 const factory: ts.server.PluginModuleFactory = (mod: {
   typescript: typeof ts;
 }) => {
   const create = (info: ts.server.PluginCreateInfo): ts.LanguageService => {
+    const config: ResolvedConfig | undefined = getViteConfig(__dirname);
+
     const ls = info.languageService;
     const lsh = info.languageServiceHost;
-    let css: any;
-    getCssOptions().then((_css) => (css = _css));
+
+    const formatExportType = (key: string) => `  readonly '${key}': '${key}';`;
 
     // オリジナルのメソッドを退避しておく
     const delegate = {
@@ -25,7 +37,6 @@ const factory: ts.server.PluginModuleFactory = (mod: {
     for (const __fileNmae of info.languageServiceHost.getScriptFileNames()) {
       log(`😱${__fileNmae}`);
     }
-
     // tooltip用のメソッドを上書き
     ls.getQuickInfoAtPosition = (fileName: string, position: number) => {
       const result = delegate.getQuickInfoAtPosition(fileName, position); // 元メソッドを呼び出す
@@ -39,7 +50,7 @@ const factory: ts.server.PluginModuleFactory = (mod: {
       result.displayParts = [
         { kind: "", text: " 🎉🎉 " },
         ...result.displayParts,
-        { kind: "", text: JSON.stringify(css) },
+        { kind: "", text: " 🎉🎉 " },
       ];
       return result;
     };
@@ -52,8 +63,45 @@ const factory: ts.server.PluginModuleFactory = (mod: {
       setNodeParents,
       scriptKind
     ): ts.SourceFile => {
-      log(`😅${fileName}`);
-      log(`😅${scriptSnapshot}`);
+      // Info 90   [14:28:05.533] fileName😅/Users/JG20033/Documents/projects/ts-css-modules-vite-plugin/example/src/hoge/hoge.module.css
+
+      if (isCSSFile(fileName)) {
+        log(`fileName😅${fileName}`);
+        log(`config${config}`);
+        if (config) {
+          let css = scriptSnapshot.getText(0, scriptSnapshot.getLength());
+          log(`css${css}`);
+
+          if (fileName.endsWith(".css")) {
+          } else {
+            try {
+              css = parseCss(css, fileName, config);
+            } catch (e) {
+              log(`css${e}`);
+            }
+          }
+          const classNameKeys = extractClassNameKeys(
+            postcssJs.objectify(postcss.parse(css))
+          );
+
+          let exportTypes = "",
+            exportClassNames = "export type ClassNames = ";
+          const exportStyle = "export default classNames;";
+          for (const classNameKey of classNameKeys.keys()) {
+            exportTypes = `${exportTypes}\n${formatExportType(classNameKey)}`;
+            exportClassNames =
+              exportClassNames !== "export type ClassNames = "
+                ? `${exportClassNames} | '${classNameKey}'`
+                : `${exportClassNames} '${classNameKey}'`;
+          }
+
+          let outputFileString = "";
+          outputFileString = `declare const classNames: {${exportTypes}\n};\n${exportStyle}\n${exportClassNames}`;
+          log(`outputFileString😅${outputFileString}`);
+
+          scriptSnapshot = ts.ScriptSnapshot.fromString(outputFileString);
+        }
+      }
       return delegate.createLanguageServiceSourceFile(
         fileName,
         scriptSnapshot,
@@ -96,7 +144,8 @@ const factory: ts.server.PluginModuleFactory = (mod: {
         $options
       ): (ts.ResolvedModuleFull | ts.ResolvedModule | undefined)[] => {
         for (const moduleName of moduleNames) {
-          log(`moduleName😱${moduleName}`);
+          // log(`containingFile${containingFile}`);
+          // log(`moduleName😱${moduleName}`);
         }
 
         if (!_resolveModuleNames) return [];
@@ -111,32 +160,32 @@ const factory: ts.server.PluginModuleFactory = (mod: {
 
         return moduleNames.map<
           ts.ResolvedModuleFull | ts.ResolvedModule | undefined
-        >((resolevedModule, index) => {
+        >((moduleName, index) => {
           if (resolvedModules[index]) {
             return {
               ...resolvedModules[index],
-              // extension: mod.typescript.Extension.Dts,
             } as ts.ResolvedModule;
           }
-          // if (!resolevedModule) {
-          //   return undefined;
-          // }
+          if (isCSSFile(moduleName)) {
+            log(
+              `resolevedModuleName😱${path.resolve(
+                path.dirname(containingFile),
+                moduleName
+              )}`
+            );
 
-          log(`resolevedModuleName😱${resolevedModule}`);
+            return {
+              resolvedFileName: path.resolve(
+                path.dirname(containingFile),
+                moduleName
+              ),
+              isExternalLibraryImport: false,
+              extension: mod.typescript.Extension.Dts,
+            } as ts.ResolvedModuleFull;
+          }
 
-          return {
-            ...resolvedModules[index],
-            extension: mod.typescript.Extension.Dts,
-          } as ts.ResolvedModuleFull;
+          return resolvedModules[index];
         });
-
-        // return _resolveModuleNames(
-        //   moduleNames,
-        //   containingFile,
-        //   reusedNames,
-        //   redirectedReference,
-        //   $options
-        // );
       };
     }
     return ls;
