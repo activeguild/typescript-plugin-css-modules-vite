@@ -3,9 +3,9 @@ import postcss from "postcss";
 import postcssJs from "postcss-js";
 import ts from "typescript/lib/tsserverlibrary";
 import { ResolvedConfig } from "vite";
+import { getViteConfig } from "./config";
 import { parseCss } from "./css";
 import { extractClassNameKeys } from "./extract";
-import { getViteConfig } from "./sample";
 // import { CSS } from "./type";
 import { isCSSFile } from "./util";
 

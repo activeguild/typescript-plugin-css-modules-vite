@@ -1,16 +1,18 @@
-export const getCssOptions = async () => {
-  try {
-    const fallbackPaths = require.resolve.paths?.("vite") || [];
-    const resolved = require.resolve("vite", {
-      paths: ["./", ...fallbackPaths],
-    });
-    const { resolveConfig } = require(resolved);
-    const { css } = await resolveConfig({}, "serve");
+import { readFileSync, unlinkSync, writeFileSync } from "fs";
+import path from "path";
+import { register } from "ts-node";
 
-    return css;
-  } catch (e) {
-    console.error(e);
-  }
+export const getViteConfig = (dirName: string) => {
+  const service = register({ transpileOnly: true });
+  const filePath = path.resolve(dirName, "../vite.config.ts");
+  const src = readFileSync(filePath);
+  const outputFilePath = path.resolve(path.dirname(filePath), "vite.config.js");
+
+  const compiledTs = service.compile(src.toString(), "vite.config.ts");
+  writeFileSync(outputFilePath, compiledTs);
+  const config = require("../vite.config.js").default;
+  unlinkSync(outputFilePath);
+  return config;
 };
 
-console.log("getCssOptions() :>> ", getCssOptions());
+console.log("getCssOptions() :>> ", getViteConfig(__dirname));
