@@ -6,15 +6,13 @@ import { ResolvedConfig } from "vite";
 import { getViteConfig } from "./config";
 import { parseCss } from "./css";
 import { extractClassNameKeys } from "./extract";
-// import { CSS } from "./type";
 import { isCSSFile } from "./util";
-
-// resolve vite.config.ts
 
 const factory: ts.server.PluginModuleFactory = (mod: {
   typescript: typeof ts;
 }) => {
   const create = (info: ts.server.PluginCreateInfo): ts.LanguageService => {
+    // resolve vite.config.ts
     const config: ResolvedConfig | undefined = getViteConfig(__dirname);
 
     const ls = info.languageService;
@@ -63,21 +61,15 @@ const factory: ts.server.PluginModuleFactory = (mod: {
       setNodeParents,
       scriptKind
     ): ts.SourceFile => {
-      // Info 90   [14:28:05.533] fileName😅/Users/JG20033/Documents/projects/ts-css-modules-vite-plugin/example/src/hoge/hoge.module.css
-
       if (isCSSFile(fileName)) {
-        log(`fileName😅${fileName}`);
-        log(`config${config}`);
         if (config) {
           let css = scriptSnapshot.getText(0, scriptSnapshot.getLength());
-          log(`css${css}`);
-
           if (fileName.endsWith(".css")) {
           } else {
             try {
               css = parseCss(css, fileName, config);
             } catch (e) {
-              log(`css${e}`);
+              log(`${e}`);
             }
           }
           const classNameKeys = extractClassNameKeys(
@@ -97,8 +89,6 @@ const factory: ts.server.PluginModuleFactory = (mod: {
 
           let outputFileString = "";
           outputFileString = `declare const classNames: {${exportTypes}\n};\n${exportStyle}\n${exportClassNames}`;
-          log(`outputFileString😅${outputFileString}`);
-
           scriptSnapshot = ts.ScriptSnapshot.fromString(outputFileString);
         }
       }
@@ -119,7 +109,6 @@ const factory: ts.server.PluginModuleFactory = (mod: {
       textChangeRange,
       aggressiveChecks
     ): ts.SourceFile => {
-      log(`😅${sourceFile}`);
       return delegate.updateLanguageServiceSourceFile(
         sourceFile,
         scriptSnapshot,
@@ -128,8 +117,6 @@ const factory: ts.server.PluginModuleFactory = (mod: {
         aggressiveChecks
       );
     };
-
-    log(`moduleName😱${delegate.resolveModuleNames}`);
 
     if (lsh.resolveModuleNames) {
       const _resolveModuleNames = lsh.resolveModuleNames.bind(
@@ -143,13 +130,6 @@ const factory: ts.server.PluginModuleFactory = (mod: {
         redirectedReference,
         $options
       ): (ts.ResolvedModuleFull | ts.ResolvedModule | undefined)[] => {
-        for (const moduleName of moduleNames) {
-          // log(`containingFile${containingFile}`);
-          // log(`moduleName😱${moduleName}`);
-        }
-
-        if (!_resolveModuleNames) return [];
-
         const resolvedModules = _resolveModuleNames(
           moduleNames,
           containingFile,
@@ -167,13 +147,6 @@ const factory: ts.server.PluginModuleFactory = (mod: {
             } as ts.ResolvedModule;
           }
           if (isCSSFile(moduleName)) {
-            log(
-              `resolevedModuleName😱${path.resolve(
-                path.dirname(containingFile),
-                moduleName
-              )}`
-            );
-
             return {
               resolvedFileName: path.resolve(
                 path.dirname(containingFile),
