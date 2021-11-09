@@ -13,16 +13,19 @@ const factory: ts.server.PluginModuleFactory = (mod: {
   typescript: typeof ts;
 }) => {
   const create = (info: ts.server.PluginCreateInfo): ts.LanguageService => {
+    const log = (logText: string) =>
+      info.project.projectService.logger.info(logText);
+
     // resolve vite.config.ts
     const config: ResolvedConfig | undefined = getViteConfig(__dirname);
-    const ls = info.languageService;
-    const lsh = info.languageServiceHost;
+    const { languageService: ls, languageServiceHost: lsh } = info;
 
     if (!config) {
+      log("[ts-css-modules-vite-plugin]: Could not find vite.config.ts");
       return ls;
     }
 
-    // オリジナルのメソッドを退避しておく
+    // evacuate the original
     const delegate = {
       getQuickInfoAtPosition: ls.getQuickInfoAtPosition,
       createLanguageServiceSourceFile:
@@ -30,29 +33,6 @@ const factory: ts.server.PluginModuleFactory = (mod: {
       updateLanguageServiceSourceFile:
         mod.typescript.updateLanguageServiceSourceFile,
       resolveModuleNames: lsh.resolveModuleNames,
-    };
-    const log = (logText: string) =>
-      info.project.projectService.logger.info(logText);
-
-    for (const __fileNmae of info.languageServiceHost.getScriptFileNames()) {
-      log(`😱${__fileNmae}`);
-    }
-    // tooltip用のメソッドを上書き
-    ls.getQuickInfoAtPosition = (fileName: string, position: number) => {
-      const result = delegate.getQuickInfoAtPosition(fileName, position); // 元メソッドを呼び出す
-      if (!result) {
-        return result;
-      }
-      if (!result.displayParts || !result.displayParts.length) {
-        return result;
-      }
-      // 結果を修正する
-      result.displayParts = [
-        { kind: "", text: " 🎉🎉 " },
-        ...result.displayParts,
-        { kind: "", text: " 🎉🎉 " },
-      ];
-      return result;
     };
 
     mod.typescript.createLanguageServiceSourceFile = (
@@ -71,7 +51,7 @@ const factory: ts.server.PluginModuleFactory = (mod: {
             try {
               css = parseCss(css, fileName, config);
             } catch (e) {
-              log(`${e}`);
+              log(`[ts-css-modules-vite-plugin]: ${e}`);
             }
           }
           const classNameKeys = extractClassNameKeys(
@@ -109,7 +89,7 @@ const factory: ts.server.PluginModuleFactory = (mod: {
             try {
               css = parseCss(css, fileName, config);
             } catch (e) {
-              log(`${e}`);
+              log(`[ts-css-modules-vite-plugin]: ${e}`);
             }
           }
           const classNameKeys = extractClassNameKeys(
