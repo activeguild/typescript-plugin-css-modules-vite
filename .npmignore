@@ -4,3 +4,8 @@ src
 release.sh
 tools
 example
+.eslintignore
+.eslintrc.js
+.prettierignore
+.prettierrc.js
+tsconfig.json
