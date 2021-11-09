@@ -54,7 +54,7 @@ const factory: ts.server.PluginModuleFactory = (mod: {
           if (fileName.endsWith(".css")) {
           } else {
             try {
-              css = parseCss(css, fileName, config);
+              css = parseCss(log, css, fileName, config);
             } catch (e) {
               log(`${e}`);
             }
@@ -92,7 +92,7 @@ const factory: ts.server.PluginModuleFactory = (mod: {
           if (fileName.endsWith(".css")) {
           } else {
             try {
-              css = parseCss(css, fileName, config);
+              css = parseCss(log, css, fileName, config);
             } catch (e) {
               log(`${e}`);
             }
