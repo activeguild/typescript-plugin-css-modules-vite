@@ -6,6 +6,7 @@ import { ResolvedConfig } from "vite";
 import { getViteConfig } from "./config";
 import { parseCss } from "./css";
 import { extractClassNameKeys } from "./extract";
+import { formatClassNames } from "./format";
 import { isCSSFile } from "./util";
 
 const factory: ts.server.PluginModuleFactory = (mod: {
@@ -14,11 +15,12 @@ const factory: ts.server.PluginModuleFactory = (mod: {
   const create = (info: ts.server.PluginCreateInfo): ts.LanguageService => {
     // resolve vite.config.ts
     const config: ResolvedConfig | undefined = getViteConfig(__dirname);
-
     const ls = info.languageService;
     const lsh = info.languageServiceHost;
 
-    const formatExportType = (key: string) => `  readonly '${key}': '${key}';`;
+    if (!config) {
+      return ls;
+    }
 
     // オリジナルのメソッドを退避しておく
     const delegate = {
@@ -76,20 +78,9 @@ const factory: ts.server.PluginModuleFactory = (mod: {
             postcssJs.objectify(postcss.parse(css))
           );
 
-          let exportTypes = "",
-            exportClassNames = "export type ClassNames = ";
-          const exportStyle = "export default classNames;";
-          for (const classNameKey of classNameKeys.keys()) {
-            exportTypes = `${exportTypes}\n${formatExportType(classNameKey)}`;
-            exportClassNames =
-              exportClassNames !== "export type ClassNames = "
-                ? `${exportClassNames} | '${classNameKey}'`
-                : `${exportClassNames} '${classNameKey}'`;
-          }
-
-          let outputFileString = "";
-          outputFileString = `declare const classNames: {${exportTypes}\n};\n${exportStyle}\n${exportClassNames}`;
-          scriptSnapshot = ts.ScriptSnapshot.fromString(outputFileString);
+          scriptSnapshot = ts.ScriptSnapshot.fromString(
+            formatClassNames(classNameKeys)
+          );
         }
       }
       return delegate.createLanguageServiceSourceFile(
@@ -109,6 +100,27 @@ const factory: ts.server.PluginModuleFactory = (mod: {
       textChangeRange,
       aggressiveChecks
     ): ts.SourceFile => {
+      const fileName = sourceFile.fileName;
+      if (isCSSFile(fileName)) {
+        if (config) {
+          let css = scriptSnapshot.getText(0, scriptSnapshot.getLength());
+          if (fileName.endsWith(".css")) {
+          } else {
+            try {
+              css = parseCss(css, fileName, config);
+            } catch (e) {
+              log(`${e}`);
+            }
+          }
+          const classNameKeys = extractClassNameKeys(
+            postcssJs.objectify(postcss.parse(css))
+          );
+
+          scriptSnapshot = ts.ScriptSnapshot.fromString(
+            formatClassNames(classNameKeys)
+          );
+        }
+      }
       return delegate.updateLanguageServiceSourceFile(
         sourceFile,
         scriptSnapshot,
