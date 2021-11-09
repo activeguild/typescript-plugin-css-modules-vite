@@ -54,7 +54,8 @@ const factory: ts.server.PluginModuleFactory = (mod: {
           if (fileName.endsWith(".css")) {
           } else {
             try {
-              css = parseCss(css, fileName, config);
+              css = parseCss(log, css, fileName, config);
+              log(`css${css}`);
             } catch (e) {
               log(`${e}`);
             }
@@ -63,6 +64,9 @@ const factory: ts.server.PluginModuleFactory = (mod: {
             postcssJs.objectify(postcss.parse(css))
           );
 
+          for (const classNameKey of classNameKeys) {
+            log(`classNameKey${classNameKey}`);
+          }
           scriptSnapshot = ts.ScriptSnapshot.fromString(
             formatClassNames(classNameKeys)
           );
@@ -92,7 +96,8 @@ const factory: ts.server.PluginModuleFactory = (mod: {
           if (fileName.endsWith(".css")) {
           } else {
             try {
-              css = parseCss(css, fileName, config);
+              css = parseCss(log, css, fileName, config);
+              log(`css${css}`);
             } catch (e) {
               log(`${e}`);
             }
@@ -100,6 +105,10 @@ const factory: ts.server.PluginModuleFactory = (mod: {
           const classNameKeys = extractClassNameKeys(
             postcssJs.objectify(postcss.parse(css))
           );
+
+          for (const classNameKey of classNameKeys) {
+            log(`classNameKey${classNameKey}`);
+          }
 
           scriptSnapshot = ts.ScriptSnapshot.fromString(
             formatClassNames(classNameKeys)

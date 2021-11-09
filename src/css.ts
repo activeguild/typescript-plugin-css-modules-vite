@@ -1,7 +1,7 @@
 import sass from "sass";
 import type { ResolvedConfig } from "vite";
 import { getPreprocessorOptions } from "./options";
-import { AdditionalData } from "./type";
+import { AdditionalData, Log } from "./type";
 
 const SPLIT_STR = `/* vite-plugin-sass-dts */\n`;
 
@@ -9,6 +9,7 @@ const SPLIT_STR = `/* vite-plugin-sass-dts */\n`;
 let loadedSassPreprocessor: any;
 
 export const parseCss = (
+  log: Log,
   file: string,
   fileName: string,
   config: ResolvedConfig
@@ -46,6 +47,14 @@ export const parseCss = (
       : finalImporter.push(options.importer);
   }
 
+  log(
+    `getData(file, fileName, options.additionalData):${getData(
+      file,
+      fileName,
+      options.additionalData
+    )}`
+  );
+
   const result = sass.renderSync({
     ...options,
     data: getData(file, fileName, options.additionalData),
@@ -53,6 +62,8 @@ export const parseCss = (
     includePaths: options.includePaths,
     importer: finalImporter,
   });
+
+  log(`result.css.toString():${result.css.toString()}`);
 
   return result.css.toString();
 };
