@@ -16,10 +16,11 @@
     "url": "git+https://github.com/activeguild/ts-css-modules-vite-plugin.git"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/activeguild/ts-css-modules-vite-plugin/issues"
   },
+  "files": ["dist"],
   "homepage": "https://github.com/activeguild/ts-css-modules-vite-plugin#readme",
   "devDependencies": {
     "@types/node": "^16.11.6",
