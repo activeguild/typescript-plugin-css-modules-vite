@@ -1,18 +1,19 @@
 import { readFileSync, unlinkSync, writeFileSync } from "fs";
 import path from "path";
 import { register } from "ts-node";
+import { Log } from "./type";
 
-export const getViteConfig = (dirName: string) => {
+export const getViteConfig = (log: Log, dirName: string) => {
   const service = register({ transpileOnly: true });
-  const filePath = path.resolve(dirName, "../vite.config.ts");
+  log(`dirName${dirName}`);
+  const filePath = path.resolve(dirName, "./vite.config.ts");
+  log(`filePath${filePath}`);
   const src = readFileSync(filePath);
-  const outputFilePath = path.resolve(path.dirname(filePath), "vite.config.js");
+  const outputFilePath = path.resolve(__dirname, "vite.config.js");
 
   const compiledTs = service.compile(src.toString(), "vite.config.ts");
   writeFileSync(outputFilePath, compiledTs);
-  const config = require("../vite.config.js").default;
+  const config = require("./vite.config.js").default;
   unlinkSync(outputFilePath);
   return config;
 };
-
-console.log("getCssOptions() :>> ", getViteConfig(__dirname));
