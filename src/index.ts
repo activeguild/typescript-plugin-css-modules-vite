@@ -16,7 +16,9 @@ const factory: ts.server.PluginModuleFactory = (mod: {
     const directory = info.project.getCurrentDirectory();
 
     const log = (logText: string) =>
-      info.project.projectService.logger.info(logText);
+      info.project.projectService.logger.info(
+        `[ts-css-modules-vite-plugin] "${logText}"`
+      );
 
     // resolve vite.config.ts
     log(`😱${directory}`);
@@ -24,7 +26,7 @@ const factory: ts.server.PluginModuleFactory = (mod: {
     const { languageService: ls, languageServiceHost: lsh } = info;
 
     if (!config) {
-      log("[ts-css-modules-vite-plugin]: Could not find vite.config.ts");
+      log("Could not find vite.config.ts");
       return ls;
     }
 
@@ -54,7 +56,7 @@ const factory: ts.server.PluginModuleFactory = (mod: {
             try {
               css = parseCss(css, fileName, config);
             } catch (e) {
-              log(`[ts-css-modules-vite-plugin]: ${e}`);
+              log(`${e}`);
             }
           }
           const classNameKeys = extractClassNameKeys(
@@ -92,7 +94,7 @@ const factory: ts.server.PluginModuleFactory = (mod: {
             try {
               css = parseCss(css, fileName, config);
             } catch (e) {
-              log(`[ts-css-modules-vite-plugin]: ${e}`);
+              log(`${e}`);
             }
           }
           const classNameKeys = extractClassNameKeys(
