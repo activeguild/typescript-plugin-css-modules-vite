@@ -19,9 +19,9 @@ const factory: ts.server.PluginModuleFactory = (mod: {
       info.project.projectService.logger.info(
         `[ts-css-modules-vite-plugin] "${logText}"`
       );
+    log(`dirName: ${dirName}`);
 
     // resolve vite.config.ts
-    log(`${dirName}`);
     const config: ResolvedConfig | undefined = getViteConfig(log, dirName);
     const { languageService: ls, languageServiceHost: lsh } = info;
 
@@ -40,22 +40,18 @@ const factory: ts.server.PluginModuleFactory = (mod: {
       resolveModuleNames: lsh.resolveModuleNames,
     };
 
-    mod.typescript.createLanguageServiceSourceFile = (
-      fileName,
-      scriptSnapshot,
-      scriptTarget,
-      version,
-      setNodeParents,
-      scriptKind
-    ): ts.SourceFile => {
+    const generateScriptSnapshot = (
+      scriptSnapshot: ts.IScriptSnapshot,
+      fileName: any
+    ) => {
       if (isCSSFile(fileName)) {
         if (config) {
           let css = scriptSnapshot.getText(0, scriptSnapshot.getLength());
           if (fileName.endsWith(".css")) {
           } else {
             try {
-              css = parseCss(log, css, fileName, config);
-              log(`css${css}`);
+              css = parseCss(log, css, fileName, config, dirName);
+              log(`css: ${css}`);
             } catch (e) {
               log(`${e}`);
             }
@@ -65,16 +61,28 @@ const factory: ts.server.PluginModuleFactory = (mod: {
           );
 
           for (const classNameKey of classNameKeys) {
-            log(`classNameKey${classNameKey}`);
+            log(`classNameKey: ${classNameKey}`);
           }
           scriptSnapshot = ts.ScriptSnapshot.fromString(
             formatClassNames(classNameKeys)
           );
         }
       }
+
+      return scriptSnapshot;
+    };
+
+    mod.typescript.createLanguageServiceSourceFile = (
+      fileName,
+      scriptSnapshot,
+      scriptTarget,
+      version,
+      setNodeParents,
+      scriptKind
+    ): ts.SourceFile => {
       return delegate.createLanguageServiceSourceFile(
         fileName,
-        scriptSnapshot,
+        generateScriptSnapshot(scriptSnapshot, fileName),
         scriptTarget,
         version,
         setNodeParents,
@@ -90,34 +98,10 @@ const factory: ts.server.PluginModuleFactory = (mod: {
       aggressiveChecks
     ): ts.SourceFile => {
       const fileName = sourceFile.fileName;
-      if (isCSSFile(fileName)) {
-        if (config) {
-          let css = scriptSnapshot.getText(0, scriptSnapshot.getLength());
-          if (fileName.endsWith(".css")) {
-          } else {
-            try {
-              css = parseCss(log, css, fileName, config);
-              log(`css${css}`);
-            } catch (e) {
-              log(`${e}`);
-            }
-          }
-          const classNameKeys = extractClassNameKeys(
-            postcssJs.objectify(postcss.parse(css))
-          );
 
-          for (const classNameKey of classNameKeys) {
-            log(`classNameKey${classNameKey}`);
-          }
-
-          scriptSnapshot = ts.ScriptSnapshot.fromString(
-            formatClassNames(classNameKeys)
-          );
-        }
-      }
       return delegate.updateLanguageServiceSourceFile(
         sourceFile,
-        scriptSnapshot,
+        generateScriptSnapshot(scriptSnapshot, fileName),
         version,
         textChangeRange,
         aggressiveChecks
