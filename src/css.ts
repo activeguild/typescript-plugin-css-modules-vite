@@ -26,6 +26,7 @@ export const parseCss = (
     )}`
   );
   log(`finalImporter:${finalImporter}`);
+  log(`finalImporter:${typeof finalImporter[0]}`);
 
   const result = sass.renderSync({
     ...options,
