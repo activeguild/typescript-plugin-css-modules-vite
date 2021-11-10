@@ -25,6 +25,7 @@ export const parseCss = (
       options.additionalData
     )}`
   );
+  log(`finalImporter:${finalImporter}`);
 
   const result = sass.renderSync({
     ...options,

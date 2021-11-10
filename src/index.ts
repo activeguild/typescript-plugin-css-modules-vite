@@ -13,7 +13,7 @@ const factory: ts.server.PluginModuleFactory = (mod: {
   typescript: typeof ts;
 }) => {
   const create = (info: ts.server.PluginCreateInfo): ts.LanguageService => {
-    const directory = info.project.getCurrentDirectory();
+    const dirName = info.project.getCurrentDirectory();
 
     const log = (logText: string) =>
       info.project.projectService.logger.info(
@@ -21,8 +21,8 @@ const factory: ts.server.PluginModuleFactory = (mod: {
       );
 
     // resolve vite.config.ts
-    log(`😱${directory}`);
-    const config: ResolvedConfig | undefined = getViteConfig(log, directory);
+    log(`${dirName}`);
+    const config: ResolvedConfig | undefined = getViteConfig(log, dirName);
     const { languageService: ls, languageServiceHost: lsh } = info;
 
     if (!config) {
