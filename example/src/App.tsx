@@ -18,7 +18,7 @@ export const App: VFC<Props> = (props) => {
         commonStyles.hoge
       )}
     >
-      vite-plugin-sass-dts-example
+      ts-css-modules-vite-plugin-example
     </header>
   );
 };

@@ -1,7 +1,7 @@
 {
   "name": "ts-css-modules-vite-plugin",
   "version": "1.0.6",
-  "description": "",
+  "description": "Read the definition of'vite.config.ts' and resolve the CSS Modules type.",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc --project tsconfig.json",
@@ -15,7 +15,7 @@
     "type": "git",
     "url": "git+https://github.com/activeguild/ts-css-modules-vite-plugin.git"
   },
-  "author": "",
+  "author": "j1ngzoue",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/activeguild/ts-css-modules-vite-plugin/issues"
@@ -40,5 +40,11 @@
     "postcss-js": "^3.0.3",
     "sass": "^1.43.4",
     "ts-node": "^10.4.0"
+  },
+    "lint-staged": {
+    "*.{js,ts,jsx,tsx}": [
+      "eslint . --fix",
+      "prettier . --write"
+    ]
   }
 }
