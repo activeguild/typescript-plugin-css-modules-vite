@@ -31,7 +31,6 @@ npm i -D ts-css-modules-vite-plugin
 Resolve the `preprocessorOptions` setting within the plugin.
 
 ```ts
-import react from "@vitejs/plugin-react";
 import path from "path";
 import { defineConfig } from "vite";
 
