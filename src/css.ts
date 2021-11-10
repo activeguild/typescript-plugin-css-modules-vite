@@ -64,7 +64,9 @@ export const replaceDirNameInFunc = (
   importer: Function,
   currDirName: string
 ) => {
-  const replacedFunc = importer.toString().replace("__dirname", currDirName);
+  const replacedFunc = importer
+    .toString()
+    .replace("__dirname", `"${currDirName}"`);
   log(`replacedFunc: ${replacedFunc}`);
   const func = new Function(`return function ${replacedFunc}`);
   return func();
