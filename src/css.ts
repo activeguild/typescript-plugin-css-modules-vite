@@ -10,30 +10,8 @@ export const parseCss = (
   config: ResolvedConfig
 ): string => {
   const options = getPreprocessorOptions(config);
-  const resolveFn = config.createResolver({
-    extensions: [".scss", ".sass", ".css"],
-    mainFields: ["sass", "style"],
-    tryIndex: true,
-    tryPrefix: "_",
-    preferRelative: true,
-  });
 
-  const internalImporter: sass.Importer = (url, importer, done) => {
-    resolveFn(url, importer).then((resolved) => {
-      if (resolved) {
-        new Promise<sass.ImporterReturnType>(function (resolve) {
-          resolve({ file: resolved });
-        })
-          .then(done)
-          .catch(done);
-      } else {
-        done && done(null);
-      }
-    });
-  };
-
-  const finalImporter = [internalImporter];
-
+  const finalImporter = [];
   if (options.importer) {
     Array.isArray(options.importer)
       ? finalImporter.push(...options.importer)
