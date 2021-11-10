@@ -1,6 +1,6 @@
 {
   "name": "ts-css-modules-vite-plugin",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Read the definition of'vite.config.ts' and resolve the CSS Modules type.",
   "main": "dist/index.js",
   "scripts": {
