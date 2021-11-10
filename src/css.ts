@@ -7,36 +7,42 @@ export const parseCss = (
   log: Log,
   file: string,
   fileName: string,
-  config: ResolvedConfig
+  config: ResolvedConfig,
+  dirName: string
 ): string => {
   const options = getPreprocessorOptions(config);
 
-  const finalImporter = [];
+  const finalImporters = [];
   if (options.importer) {
-    Array.isArray(options.importer)
-      ? finalImporter.push(...options.importer)
-      : finalImporter.push(options.importer);
+    const tempImporters = Array.isArray(options.importer)
+      ? [...options.importer]
+      : [options.importer];
+
+    finalImporters.push(
+      ...tempImporters.map((tempImporter) =>
+        replaceDirNameInFunc(log, tempImporter, dirName)
+      )
+    );
   }
 
   log(
-    `getData(file, fileName, options.additionalData):${getData(
+    `getData(file, fileName, options.additionalData): ${getData(
       file,
       fileName,
       options.additionalData
     )}`
   );
-  log(`finalImporter:${finalImporter}`);
-  log(`finalImporter:${typeof finalImporter[0]}`);
+  log(`finalImporter:${finalImporters}`);
 
   const result = sass.renderSync({
     ...options,
     data: getData(file, fileName, options.additionalData),
     file: fileName,
     includePaths: options.includePaths,
-    importer: finalImporter,
+    importer: finalImporters,
   });
 
-  log(`result.css.toString():${result.css.toString()}`);
+  log(`result.css.toString(): ${result.css.toString()}`);
 
   return result.css.toString();
 };
@@ -51,4 +57,15 @@ const getData = (
     return additionalData(`\n${data}`, filename);
   }
   return `${additionalData}\n${data}`;
+};
+
+export const replaceDirNameInFunc = (
+  log: Log,
+  importer: Function,
+  currDirName: string
+) => {
+  const replacedFunc = importer.toString().replace("__dirname", currDirName);
+  log(`replacedFunc: ${replacedFunc}`);
+  const func = new Function(`return function ${replacedFunc}`);
+  return func();
 };
