@@ -7,22 +7,15 @@ export const parseCss = (
   log: Log,
   file: string,
   fileName: string,
-  config: ResolvedConfig,
-  dirName: string
+  config: ResolvedConfig
 ): string => {
   const options = getPreprocessorOptions(config);
 
   const finalImporters = [];
   if (options.importer) {
-    const tempImporters = Array.isArray(options.importer)
-      ? [...options.importer]
-      : [options.importer];
-
-    finalImporters.push(
-      ...tempImporters.map((tempImporter) =>
-        replaceDirNameInFunc(log, tempImporter, dirName)
-      )
-    );
+    Array.isArray(options.importer)
+      ? finalImporters.push(...options.importer)
+      : finalImporters.push(options.importer);
   }
 
   log(
@@ -57,17 +50,4 @@ const getData = (
     return additionalData(`\n${data}`, filename);
   }
   return `${additionalData}\n${data}`;
-};
-
-export const replaceDirNameInFunc = (
-  log: Log,
-  importer: Function,
-  currDirName: string
-) => {
-  const replacedFunc = importer
-    .toString()
-    .replace("__dirname", `"${currDirName}"`);
-  log(`replacedFunc: ${replacedFunc}`);
-  const func = new Function(`return function ${replacedFunc}`);
-  return func();
 };
