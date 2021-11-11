@@ -5,9 +5,9 @@ import { Log } from "./type";
 
 export const getViteConfig = (log: Log, dirName: string) => {
   const service = register({ transpileOnly: true });
-  log(`dirName${dirName}`);
+  log(`dirName: ${dirName}`);
   const filePath = path.resolve(dirName, "./vite.config.ts");
-  log(`filePath${filePath}`);
+  log(`filePath: ${filePath}`);
   const src = readFileSync(filePath);
   const outputFilePath = path.resolve(__dirname, "vite.config.js");
 
@@ -21,7 +21,7 @@ export const getViteConfig = (log: Log, dirName: string) => {
   return config;
 };
 
-export const replaceDirName = (log: Log, src: Buffer, dirName: string) => {
+const replaceDirName = (log: Log, src: Buffer, dirName: string) => {
   const replaceDirName = src.toString().replace("__dirname", `"${dirName}"`);
   log(`replacedFunc: ${replaceDirName}`);
 
