@@ -15,6 +15,14 @@
     "type": "git",
     "url": "git+https://github.com/activeguild/ts-css-modules-vite-plugin.git"
   },
+  "keywords": [
+    "vite",
+    "typescript-plugin",
+    "css",
+    "scss",
+    "typescript",
+    "cssmodules"
+  ],
   "author": "j1ngzoue",
   "license": "MIT",
   "bugs": {
