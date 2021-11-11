@@ -50,7 +50,7 @@ const factory: ts.server.PluginModuleFactory = (mod: {
           if (fileName.endsWith(".css")) {
           } else {
             try {
-              css = parseCss(log, css, fileName, config, dirName);
+              css = parseCss(log, css, fileName, config);
               log(`css: ${css}`);
             } catch (e) {
               log(`${e}`);

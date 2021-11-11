@@ -11,9 +11,19 @@ export const getViteConfig = (log: Log, dirName: string) => {
   const src = readFileSync(filePath);
   const outputFilePath = path.resolve(__dirname, "vite.config.js");
 
-  const compiledTs = service.compile(src.toString(), "vite.config.ts");
+  const compiledTs = service.compile(
+    replaceDirName(log, src, dirName),
+    "vite.config.ts"
+  );
   writeFileSync(outputFilePath, compiledTs);
   const config = require("./vite.config.js").default;
   unlinkSync(outputFilePath);
   return config;
+};
+
+export const replaceDirName = (log: Log, src: Buffer, dirName: string) => {
+  const replaceDirName = src.toString().replace("__dirname", `"${dirName}"`);
+  log(`replacedFunc: ${replaceDirName}`);
+
+  return replaceDirName;
 };
