@@ -9,11 +9,21 @@
 Read the definition of `vite.config.ts` and resolve the `CSS Modules` type.
 Supports `sass`.
 
+## Demo
+
+<img src="https://user-images.githubusercontent.com/39351982/141417812-4b4b3963-897f-4dce-840d-a0bb04a82bd1.gif" width="600" />
+
 ## Install
 
 ```bash
 npm i -D ts-css-modules-vite-plugin
 ```
+
+## Options
+
+| Parameter | Type   | Description                                                                            |
+| --------- | ------ | -------------------------------------------------------------------------------------- |
+| root      | string | Set the relative path from the project root to the 'vite.config.ts' file. (default ./) |
 
 ## Add it to the `tsconfig.json`
 
@@ -21,7 +31,7 @@ npm i -D ts-css-modules-vite-plugin
 {
   "compilerOptions": {
     ...
-    "plugins": [{"name": "ts-css-modules-vite-plugin"}]
+    "plugins": [{"name": "ts-css-modules-vite-plugin", "root": "./"}]
   },
 }
 ```
