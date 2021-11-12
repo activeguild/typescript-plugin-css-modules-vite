@@ -7,19 +7,23 @@ import { getViteConfig } from "./config";
 import { parseCss } from "./css";
 import { extractClassNameKeys } from "./extract";
 import { formatClassNames } from "./format";
+import { getPluginOptions } from "./options";
 import { isCSSFile } from "./util";
 
 const factory: ts.server.PluginModuleFactory = (mod: {
   typescript: typeof ts;
 }) => {
   const create = (info: ts.server.PluginCreateInfo): ts.LanguageService => {
-    const dirName = info.project.getCurrentDirectory();
-
     const log = (logText: string) =>
       info.project.projectService.logger.info(
         `[ts-css-modules-vite-plugin] "${logText}"`
       );
+
+    let dirName = info.project.getCurrentDirectory();
+    const options = getPluginOptions(log, info.config);
+    dirName = path.resolve(dirName, options.root);
     log(`dirName: ${dirName}`);
+    log(`options: ${JSON.stringify(options)}`);
 
     // resolve vite.config.ts
     const config: ResolvedConfig | undefined = getViteConfig(log, dirName);
