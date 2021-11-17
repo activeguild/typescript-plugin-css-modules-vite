@@ -63,3 +63,14 @@ export default defineConfig({
   },
 });
 ```
+
+## Using VS Code
+
+The VScode typescript version needs to match the project.
+Set the following.
+
+```json
+{
+  "typescript.tsdk": "node_modules/typescript/lib"
+}
+```
