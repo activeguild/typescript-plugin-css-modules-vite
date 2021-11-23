@@ -1,9 +1,9 @@
 import { classNamesFunc } from "classnames-generics";
 import { VFC } from "react";
 import styles from "./App.module.scss";
-import commonStyles, { ClassNames } from "./common/common.module.css";
+import commonStyles from "./common/common.module.css";
 
-const classNames = classNamesFunc<keyof typeof styles | ClassNames>();
+const classNames = classNamesFunc<keyof typeof styles>();
 type Props = {
   active: boolean;
 };
