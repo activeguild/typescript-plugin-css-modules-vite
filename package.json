@@ -34,22 +34,22 @@
   ],
   "homepage": "https://github.com/activeguild/ts-css-modules-vite-plugin#readme",
   "devDependencies": {
-    "@types/node": "^16.11.9",
-    "@types/sass": "^1.43.0",
-    "@typescript-eslint/eslint-plugin": "^5.4.0",
-    "@typescript-eslint/parser": "^5.4.0",
-    "esbuild-register": "^3.1.2",
-    "eslint": "^8.3.0",
-    "husky": "^7.0.4",
-    "lint-staged": "^11.2.6",
-    "prettier": "^2.4.1",
-    "typescript": "^4.5.2",
-    "vite": "^2.6.14"
+    "@types/node": "^18.11.17",
+    "@types/sass": "^1.43.1",
+    "@typescript-eslint/eslint-plugin": "^5.47.0",
+    "@typescript-eslint/parser": "^5.47.0",
+    "esbuild-register": "^3.4.2",
+    "eslint": "^8.30.0",
+    "husky": "^8.0.2",
+    "lint-staged": "^13.1.0",
+    "prettier": "^2.8.1",
+    "typescript": "^4.9.4",
+    "vite": "^4.0.3"
   },
   "dependencies": {
-    "postcss-js": "^3.0.3",
-    "sass": "^1.43.4",
-    "ts-node": "^10.4.0"
+    "postcss-js": "^4.0.0",
+    "sass": "^1.57.1",
+    "ts-node": "^10.9.1"
   },
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": [

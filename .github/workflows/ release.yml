@@ -1,32 +1,25 @@
 name: automatic release
 on:
   push:
-    branches:
-      - master
     tags:
-      - "!*"
+      - "v*"
 jobs:
   release:
-    name: check version and tagging
+    name: package publish
     runs-on: ubuntu-latest
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
     steps:
       - name: checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup Node.js environment
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: 13.x
+          node-version: 18.x
           registry-url: "https://registry.npmjs.org"
-      - name: install can-npm-publish and dependencies
-        run: |
-          npm install -D can-npm-publish
-          npm ci
-      - name: check version and add tag
-        env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-          REPO: ${{github.repository}}
-          COMMIT: ${{github.sha}}
-        run: ./tools/release.sh
+      - name: install
+        run: npm ci
       - name: build
         run: npm run build
       - name: release
