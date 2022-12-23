@@ -74,3 +74,6 @@ Set the following.
   "typescript.tsdk": "node_modules/typescript/lib"
 }
 ```
+
+Use the workspace version.
+![スクリーンショット 2022-12-23 23 20 51](https://user-images.githubusercontent.com/39351982/209350906-4eaef407-6a69-49b0-99a7-43ccd46c449e.png)
