@@ -7,7 +7,7 @@ import { getViteConfig } from "./config";
 import { parseCss } from "./css";
 import { extractClassNameKeys } from "./extract";
 import { formatClassNames } from "./format";
-import { getPluginOptions } from "./options";
+import { getParseCase, getPluginOptions } from "./options";
 import { isCSSFile } from "./util";
 
 const factory: ts.server.PluginModuleFactory = (mod: {
@@ -60,8 +60,10 @@ const factory: ts.server.PluginModuleFactory = (mod: {
               log(`${e}`);
             }
           }
+          const toParseCase = getParseCase(config);
           const classNameKeys = extractClassNameKeys(
-            postcssJs.objectify(postcss.parse(css))
+            postcssJs.objectify(postcss.parse(css)),
+            toParseCase
           );
 
           for (const classNameKey of classNameKeys) {

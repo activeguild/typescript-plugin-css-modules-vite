@@ -1,6 +1,6 @@
 export const formatClassNames = (classNameKeys: Map<string, boolean>) => {
   let exportTypes = "";
-  const exportStyle = "export default classNames;";
+  const exportStyle = "export = classNames;";
   for (const classNameKey of classNameKeys.keys()) {
     exportTypes = `${exportTypes}\n${formatExportType(classNameKey)}`;
   }

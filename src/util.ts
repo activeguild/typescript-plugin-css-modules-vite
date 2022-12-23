@@ -2,3 +2,21 @@ export const cssLangs = `\\.(css|sass|scss)($|\\?)`;
 export const cssLangReg = new RegExp(cssLangs);
 
 export const isCSSFile = (request: string): boolean => cssLangReg.test(request);
+
+export const toDashCase = (target: string) =>
+  target
+    .replace(/[-_ /~ . ][A-z0-9]/g, (v) => {
+      return "-" + v.slice(1);
+    })
+    .toLowerCase();
+
+export const toCamelCase = (target: string) =>
+  target
+    .replace(/^[A-Z]/, (m) => m.toLowerCase())
+    .replace(/[-_ ./~ ]+([A-z0-9])/g, (m, $1) => $1.toUpperCase());
+
+export const collectionToObj = <V>(collection: Record<string, V>[]) => {
+  return collection.reduce((acc, item): Record<string, V> => {
+    return { ...acc, ...item };
+  }, {});
+};
